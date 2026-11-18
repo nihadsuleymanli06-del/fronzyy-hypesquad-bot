@@ -406,4 +406,10 @@ client.on('interactionCreate', async (interaction) => {
   }
 });
 
+// Render-də token yoxlanışı ilə giriş
+if (!process.env.DISCORD_TOKEN) {
+  console.error("❌ HATA: DISCORD_TOKEN environment dəyişəni tapılmadı! Render panelindən əlavə edin.");
+  process.exit(1);
+}
+
 client.login(process.env.DISCORD_TOKEN);
