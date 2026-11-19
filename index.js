@@ -210,12 +210,12 @@ client.on('interactionCreate', async (interaction) => {
       .setCustomId('select_remove_account')
       .setPlaceholder('Silmek istediğiniz hesabı seçin...')
       .addOptions([
-        { label: 'Bütün Tokenleri Sil', value: 'clear_all_tokens', description: 'Size ait olan bütün tokenleri sistemden siler', emoji: '🗑️' },
+        { label: 'Bütün Tokenleri Sil', value: 'clear_all_tokens', description: 'Size ait olan bütün tokenleri sistemden siler', emoji: '❌' },
         ...tokens.map((t, index) => ({
           label: `${t.name} (${t.username})`,
           value: index.toString(),
           description: `Bu hesabı sil`,
-          emoji: '❌'
+          emoji: '✖️'
         }))
       ]);
 
