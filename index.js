@@ -120,9 +120,6 @@ client.on('messageCreate', async (message) => {
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent('• **Token Sil** : Eklediğiniz tokenleri tek tek veya tümünü silebilirsiniz.')
       )
-      .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent('• **Durdur** : Seçtiğiniz hesap veya hesaplardaki HypeSquad rozetini kaldırır.')
-      )
       .addSeparatorComponents(
         new SeparatorBuilder().setDivider(true)
       )
@@ -154,12 +151,6 @@ client.on('messageCreate', async (message) => {
       new ButtonBuilder()
         .setCustomId('remove_token_panel')
         .setLabel('Token Sil')
-        .setStyle(ButtonStyle.Danger)
-        .setEmoji('🗑️'),
-
-      new ButtonBuilder()
-        .setCustomId('stop_hypesquad_panel')
-        .setLabel('Durdur')
         .setStyle(ButtonStyle.Danger)
         .setEmoji('🗑️')
     );
@@ -253,78 +244,6 @@ client.on('interactionCreate', async (interaction) => {
 
     const row = new ActionRowBuilder().addComponents(selectMenu);
     await interaction.reply({ content: 'HypeSquad rozeti eklemek istediğiniz hesabı seçin:', components: [row], ephemeral: true });
-  }
-
-  // --- 4.1. DURDUR BUTONU (Hypesquad Rozetini Kaldırma Menüsü) ---
-  if (interaction.isButton() && interaction.customId === 'stop_hypesquad_panel') {
-    const tokens = userTokens.get(userId);
-    if (!tokens || tokens.length === 0) {
-      return interaction.reply({ content: '⚠️ Önce "Token Ekle" veya "Toplu Token Ekle" butonundan bir hesap eklemelisiniz!', ephemeral: true });
-    }
-
-    const selectMenu = new StringSelectMenuBuilder()
-      .setCustomId('select_stop_hypesquad_account')
-      .setPlaceholder('İşlemi durdurmak/kaldırmak istediğiniz hesabı seçin...')
-      .addOptions([
-        { label: 'Bütün Hesaplar', value: 'all_accounts', description: 'Eklediğiniz bütün hesaplardaki rozeti kaldırır' },
-        ...tokens.map((t, index) => ({
-          label: `${t.name} (${t.username})`,
-          value: index.toString(),
-          description: `Seçilen hesap: ${t.name}`
-        }))
-      ]);
-
-    const row = new ActionRowBuilder().addComponents(selectMenu);
-    await interaction.reply({ content: 'Hangi hesapta durdurmak (rozeti kaldırmak) istiyorsanız seçin:', components: [row], ephemeral: true });
-  }
-
-  // --- 4.2. DURDURMA / ROZET KALDIRMA İŞLEMİ ---
-  if (interaction.isStringSelectMenu() && interaction.customId === 'select_stop_hypesquad_account') {
-    const accountSelection = interaction.values[0];
-    const tokens = userTokens.get(userId);
-
-    if (!tokens || tokens.length === 0) {
-      return interaction.update({ content: '❌ Kayıtlı hesabınız bulunmuyor.', components: [] });
-    }
-
-    let targetTokens = [];
-    if (accountSelection === 'all_accounts') {
-      targetTokens = tokens;
-    } else {
-      const acc = tokens[parseInt(accountSelection)];
-      if (acc) targetTokens = [acc];
-    }
-
-    await interaction.update({ content: `⏳ Seçilen ${targetTokens.length} hesap için işlem uygulanıyor...`, components: [] });
-
-    let successCount = 0;
-    let failCount = 0;
-
-    for (const tObj of targetTokens) {
-      try {
-        const response = await fetch("https://discord.com/api/v9/hypesquad/online", {
-          method: "DELETE",
-          headers: {
-            "Authorization": tObj.token,
-            "Content-Type": "application/json"
-          }
-        });
-
-        if (response.status === 204) {
-          successCount++;
-        } else {
-          failCount++;
-        }
-      } catch (err) {
-        failCount++;
-      }
-    }
-
-    await interaction.editReply({
-      content: `🗑️ **Durdurma İşlemi Tamamlandı!**\n` +
-               `✅ Başarılı: **${successCount}** hesap\n` +
-               `❌ Hata alınan: **${failCount}** hesap`
-    });
   }
 
   // --- 5. HESAP SEÇİLDİKTƏN SONRA HYPEQUAD EVİNİ SEÇMƏK ÜÇÜN MENÜ ---
