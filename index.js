@@ -215,7 +215,7 @@ client.on('interactionCreate', async (interaction) => {
           label: `${t.name} (${t.username})`,
           value: index.toString(),
           description: `Bu hesabı sil`,
-          emoji: '✖️'
+          emoji: '❌'
         }))
       ]);
 
